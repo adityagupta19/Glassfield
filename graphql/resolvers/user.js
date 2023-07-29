@@ -14,7 +14,7 @@ const generateToken = (user) => {
 			email: user.email,
 			username: user.email,
 		},
-		SECRET_KEY,
+		process.env.SECRET_KEY,
 		{ expiresIn: "1h" }
 	);
 };
@@ -22,11 +22,12 @@ const generateToken = (user) => {
 module.exports = {
 	Query: {},
 	Mutation: {
-		async reqister(
+		async register(
 			_,
-			{ reqisterInput: { username, email, password, confirmPassword } },
+			{ registerInput: { username, email, password, confirmPassword } },
 			context
 		) {
+			console.log("ok");
 			const { valid, errors } = validateRegisterInput(
 				username,
 				email,
@@ -46,13 +47,13 @@ module.exports = {
 				});
 			}
 
-			password = await bycrpt.hash(password, 17);
+			password = await bcrypt.hash(password, 17);
 
 			const newUser = await User.create({
 				email,
 				username,
 				password,
-				createdAt: new Date.toISOString(),
+				createdAt: new Date().toISOString(),
 			});
 			const token = generateToken(newUser);
 			return {
@@ -74,7 +75,7 @@ module.exports = {
 				throw new UserInputError("User not found", { errors });
 			}
 
-			const match = await bycrpt.compare(password, user.password);
+			const match = await bcrypt.compare(password, user.password);
 			if (!match) {
 				errors.general = "Wrong Credentails";
 				throw new UserInputError("Wrong Credentails", { errors });
@@ -82,8 +83,8 @@ module.exports = {
 
 			const token = generateToken(user);
 			return {
-				...newUser._doc,
-				id: newUser._id,
+				...user._doc,
+				id: user._id,
 				token,
 			};
 		},

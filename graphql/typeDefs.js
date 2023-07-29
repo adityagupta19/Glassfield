@@ -6,6 +6,21 @@ const typeDefs = gql`
 		body: String!
 		createdAt: String!
 		username: String!
+		comments: [Comment]!
+		likes: [Like]!
+	}
+
+	type Comment {
+		id: ID!
+		createdAt: String!
+		body: String!
+		username: String!
+	}
+
+	type Like {
+		id: ID!
+		createdAt: String!
+		username: String!
 	}
 
 	type User {
@@ -13,10 +28,10 @@ const typeDefs = gql`
 		email: String!
 		username: String!
 		token: String!
-		creadtedAt: String!
+		createdAt: String!
 	}
 
-	input RegisterInput{
+	input RegisterInput {
 		username: String!
 		password: String!
 		confirmPassword: String!
@@ -25,11 +40,14 @@ const typeDefs = gql`
 
 	type Query {
 		getPosts: [Post]
+		getPost(postId: ID!): Post
 	}
 
-	type Mutation{
-		register(registerInput: RegisterInput) : User!
-		login(username: String!, password: String!) : User!
+	type Mutation {
+		register(registerInput: RegisterInput): User!
+		login(username: String!, password: String!): User!
+		createPost(body: String!): Post!
+		deletePost(postId: ID!): String!
 	}
 `;
 module.exports = typeDefs;
